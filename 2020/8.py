@@ -1,3 +1,7 @@
+from functools import partial
+from itertools import starmap
+
+
 def replaced(ops):
     for i, op in enumerate(ops):
         if op['op'] == 'nop':
@@ -29,8 +33,5 @@ for f in ('sample8.txt', 'input8.txt'):
            for line in open(f).readlines()]
     print(f)
     print(execute(ops))
-    for i, override in replaced(ops):
-        (acc, success) = execute(ops, i, override)
-        if success:
-            print(acc)
-            break
+    print(next(acc for acc, success in starmap(
+        partial(execute, ops), replaced(ops)) if success))
