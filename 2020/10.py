@@ -1,17 +1,10 @@
+from collections import Counter
 for f in ('sample10.txt', 'input10.txt'):
 
     numbers = [int(line.strip()) for line in open(f).readlines()]
     numbers.sort()
-    prev = 0
-    ones, threes = 0, 0
-    for n in numbers:
-        if n - prev == 1:
-            ones = ones + 1
-        elif n - prev == 3:
-            threes = threes + 1
-        prev = n
-    threes = threes + 1
-    print(ones * threes)
+    counts = Counter(b - a for a, b in zip([0] + numbers[:-1], numbers))
+    print(counts[1] * (counts[3] + 1))
 
     cache = {}
 
