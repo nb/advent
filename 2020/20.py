@@ -23,10 +23,12 @@ for f in ('sample20.txt', 'input20.txt'):
                     commons[tile_id].append(other_tile_id)
     print(math.prod((tile_id for tile_id in tiles if len(commons[tile_id])==2)))
 
-    # searched for ##....### (regex) – 13 solutions in my
-    # so, let's try double that: 26 monsters, too high
-    # try triple: 39: too low
-    # a couple more tries: 30 :)
+    # searched for ##....### (regex) – 13 occurrences in the original tiles
+    # so, let's say half of those are monsters and four times more monsters come
+    # from rotations/flips/etc., so we can try double that: 26 monsters
+    # tried 26 – too high
+    # tried 39 (triple) – too low :-) binary search is on!
+    # a couple more tries – 30 :)
     total_monsters = 30
     monster_sharps = 15
     print(sharps - total_monsters * monster_sharps)
