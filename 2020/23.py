@@ -1,8 +1,9 @@
 class Node():
-    def __init__(self, v, l=None, r=None):
+    __slots__ = ['v', 'r', 'd']
+    def __init__(self, v):
         self.v = v
-        self.l = l
-        self.r = r
+        self.r = None
+        self.d = None
 
 def loop(node, n):
     for _ in range(n):
@@ -16,33 +17,25 @@ def play(s, n, moves):
     n2node = {cups[0]: first}
     for i in range(1, n):
         v = cups[i] if i < len(cups) else i+1
-        current = Node(v, prev)
+        current = Node(v)
         prev.r = current
         n2node[v] = current
         prev = current
-    first.l = prev
+    for node in n2node.values():
+        node.d = n2node[node.v - 1 if node.v > 1 else n]
     prev.r = first
     current = first
     for i in range(moves):
-        if moves > 1000 and i % 1000000 == 0:
-            print('\tprogress %d' % i)
         x, y, z = current.r, current.r.r, current.r.r.r
-        d = current.v - 1
-        while True:
-            if d in (x.v, y.v, z.v) or d < 1 or d > n:
-                d = d - 1 if d >= 1 else n
-            else:
-                break
-        dnode = n2node[d]
+        dest = current.d
+        while dest.v in (x.v, y.v, z.v):
+            dest = dest.d
         # remove x, y, z
         current.r = z.r
-        z.r.l = current
         # move them after d
-        old_dr = dnode.r
-        dnode.r = x
-        old_dr.l = z
+        old_dr = dest.r
+        dest.r = x
         z.r = old_dr
-        x.l = dnode
         current = current.r
     one = n2node[1]
     if n < 100:
