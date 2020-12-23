@@ -1,31 +1,56 @@
-import re
-import math
-from itertools import chain, repeat
-from functools import reduce, partial
-from collections import defaultdict
+class Node():
+    def __init__(self, v, l=None, r=None):
+        self.v = v
+        self.l = l
+        self.r = r
 
-for f in ('389125467', '398254716'):
-    cups = list(map(int, list(f)))
-    print(list(cups))
-    n = len(cups)
-    c = 0
-    mi, ma = min(cups), max(cups)
-    for i in range(100):
-        x, y, z = cups[(c+1)%n], cups[(c+2)%n], cups[(c+3)%n]
-        oc = cups[c]
-        d = cups[c] - 1
-        cups = [i for j, i in enumerate(cups) if j not in ((c+1)%n, (c+2)%n, (c+3)%n)]
+def loop(node, n):
+    for _ in range(n):
+        yield node
+        node = node.r
+
+def play(s, n, moves):
+    cups = list(map(int, list(s)))
+    first = Node(cups[0])
+    prev = first
+    n2node = {cups[0]: first}
+    for i in range(1, n):
+        v = cups[i] if i < len(cups) else i+1
+        current = Node(v, prev)
+        prev.r = current
+        n2node[v] = current
+        prev = current
+    first.l = prev
+    prev.r = first
+    current = first
+    for i in range(moves):
+        if moves > 1000 and i % 1000000 == 0:
+            print('\tprogress %d' % i)
+        x, y, z = current.r, current.r.r, current.r.r.r
+        d = current.v - 1
         while True:
-            if d in cups:
+            if d in (x.v, y.v, z.v) or d < 1 or d > n:
+                d = d - 1 if d >= 1 else n
+            else:
                 break
-            if d in (x, y, z):
-                d -= 1
-            if d < mi:
-                d = ma
-        di = cups.index(d)
-        cups = cups[:(di+1)] + [x, y, z] + cups[(di+1):100]
-        c = (cups.index(oc)+1)%n
+        dnode = n2node[d]
+        # remove x, y, z
+        current.r = z.r
+        z.r.l = current
+        # move them after d
+        old_dr = dnode.r
+        dnode.r = x
+        old_dr.l = z
+        z.r = old_dr
+        x.l = dnode
+        current = current.r
+    one = n2node[1]
+    if n < 100:
+        return ''.join(str(x.v) for x in loop(one.r, n-1))
+    else:
+        return one.r.v * one.r.r.v
 
-    i1 = cups.index(1)
-    print(''.join(map(str, (cups*2)[i1+1:i1+9])))
-        
+for s in ('389125467', '398254716'):
+    print('*** %s' % s)
+    print(play(s, len(s), 100))
+    print(play(s, 1000000, 10000000))
