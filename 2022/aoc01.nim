@@ -3,7 +3,7 @@ import math
 
 # works!
 # we need sugar for chaining and for => operator
-let sums0 = (readFile("01.txt").split("\n\n")).map(elf => elf.split('\n').map(calorie => calorie.parseInt).sum)
+let sums0 = (readFile("01.txt").split("\n\n")).map(elf => elf.split('\n').map(parseInt).sum)
 
 # let's try collect, their version of multiline comprehensions
 # I kinda like them better then yield
